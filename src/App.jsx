@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { NavLink } from "react-router";
 
 function App() {
   const [users, setUsers] = useState([]);
@@ -83,6 +84,7 @@ function App() {
               <th>Email</th>
               <th>Age</th>
               <th>Action</th>
+              <th>Edit</th>
             </tr>
           </thead>
 
@@ -101,6 +103,11 @@ function App() {
                   >
                     {deletingId === user.id ? "Deleting..." : "Delete"}
                   </button>
+                </td>
+                <td>
+                  <NavLink className="btn-primary" to={`/edit/${user.id}`}>
+                    Edit
+                  </NavLink>
                 </td>
               </tr>
             ))}
