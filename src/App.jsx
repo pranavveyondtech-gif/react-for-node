@@ -79,6 +79,7 @@ function App() {
         <table>
           <thead>
             <tr>
+              <th>Image</th>
               <th>ID</th>
               <th>Name</th>
               <th>Email</th>
@@ -91,6 +92,17 @@ function App() {
           <tbody>
             {users.map((user, index) => (
               <tr key={index}>
+                <td>
+                  <img
+                    src={user?.image || "-"}
+                    alt={user.name}
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      borderRadius: "10px",
+                    }}
+                  />
+                </td>
                 <td>{user?.id || "-"}</td>
                 <td>{user?.name || "-"}</td>
                 <td>{user?.email || "-"}</td>

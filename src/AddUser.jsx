@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router";
 
 function AddUser() {
@@ -8,8 +8,10 @@ function AddUser() {
     email: "",
     age: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const fileRef = useRef(null);
 
   const handleChange = (e) => {
     setForm((prev) => ({
@@ -22,22 +24,34 @@ function AddUser() {
     e.preventDefault();
     setError("");
 
+    const selectedFile = fileRef.current?.files[0];
+
+    if (!selectedFile) {
+      setError("Please select image");
+      return;
+    }
+
+    if (!selectedFile.type.startsWith("image/")) {
+      setError("Only image files allowed");
+      return;
+    }
+
     try {
       setLoading(true);
 
-      const payload = {
-        ...form,
-        age: Number(form.age),
-      };
+      //appending values in formadata
+      const formData = new FormData();
 
-      console.log("🚀 Sending POST request:", payload);
+      Object.keys(form).forEach((key) => {
+        formData.append(key, form[key]);
+      });
 
+      formData.append("image", selectedFile);
+
+      //sending post request
       const res = await fetch("http://localhost:3000/users", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+        body: formData,
       });
 
       if (!res.ok) {
@@ -50,7 +64,8 @@ function AddUser() {
       console.log("✅ User created successfully:", data);
 
       // ✅ Reset form before navigation (optional but clean)
-      setForm({ name: "", email: "", age: "", role: "" });
+      setForm({ name: "", email: "", age: "" });
+      if (fileRef.current) fileRef.current.value = "";
 
       window.alert("User added successfully");
     } catch (err) {
@@ -100,6 +115,18 @@ function AddUser() {
             onChange={handleChange}
             required
             placeholder="Enter age"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Image</label>
+          <input
+            name="image"
+            type="file"
+            accept="image/*"
+            ref={fileRef}
+            required
+            placeholder="Upload image"
           />
         </div>
 

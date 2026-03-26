@@ -3,13 +3,15 @@ import { useNavigate, useParams } from "react-router";
 
 function EditUser() {
   const navigate = useNavigate();
-  let param = useParams();
+  const param = useParams();
 
   const [form, setForm] = useState({
     name: "",
     email: "",
     age: "",
   });
+
+  const [image, setImage] = useState(""); // separate image state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -20,22 +22,47 @@ function EditUser() {
     }));
   };
 
+  // image preview
+  const getImagePreview = () => {
+    if (!image) return "";
+
+    if (typeof image === "string") {
+      return image; // old image
+    }
+
+    return URL.createObjectURL(image); // new image preview
+  };
+
+  // FETCH USER
   useEffect(() => {
     async function fetchINIT() {
-      setLoading(true);
-      let user = await fetch(`http://localhost:3000/users/${param.EditID}`);
-      if (!user.ok) {
-        setError("User not found");
-        throw new Error("User not found");
+      try {
+        setLoading(true);
+
+        const res = await fetch(`http://localhost:3000/users/${param.EditID}`);
+
+        if (!res.ok) {
+          throw new Error("User not found");
+        }
+
+        const data = await res.json();
+
+        console.log("Fetched data:", data);
+
+        setImage(data.image); // store image separately
+        delete data.image; // remove from form
+        setForm(data); // fill form
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
-      let data = await user.json();
-      setForm(data);
-      setLoading(false);
     }
 
     fetchINIT();
   }, [param.EditID]);
 
+  //  SUBMIT (UPDATE USER)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -43,34 +70,32 @@ function EditUser() {
     try {
       setLoading(true);
 
-      const payload = {
-        ...form,
-        age: Number(form.age),
-      };
+      const formData = new FormData();
 
-      console.log("🚀 Sending POST request:", payload);
+      formData.append("name", form.name);
+      formData.append("email", form.email);
+      formData.append("age", form.age);
 
-      const res = await fetch("http://localhost:3000/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+      // Only send image if user selected new one
+      if (image instanceof File) {
+        formData.append("image", image);
+      }
+
+      const res = await fetch(`http://localhost:3000/users/${param.EditID}`, {
+        method: "PATCH",
+        body: formData,
       });
 
       if (!res.ok) {
         const errData = await res.json();
-        console.log("❌ Server error:", errData);
-        throw new Error(errData.error || "Failed to add user");
+        throw new Error(errData.error || "Failed to update user");
       }
 
       const data = await res.json();
-      console.log("✅ User created successfully:", data);
+      console.log("✅ User updated:", data);
 
-      // ✅ Reset form before navigation (optional but clean)
-      setForm({ name: "", email: "", age: "", role: "" });
-
-      window.alert("User added successfully");
+      window.alert("User updated successfully");
+      navigate("/"); // go back
     } catch (err) {
       console.log("🔥 Error:", err.message);
       setError(err.message);
@@ -79,9 +104,11 @@ function EditUser() {
     }
   };
 
+  if (loading) return <h2>Loading...</h2>;
+
   return (
     <div className="page-container">
-      <h2>Add New User</h2>
+      <h2>Edit User</h2>
 
       {error && <p className="error-msg">{error}</p>}
 
@@ -121,16 +148,34 @@ function EditUser() {
           />
         </div>
 
+        <div className="form-group">
+          <label>Image</label>
+
+          {/* Show current image */}
+          {image && (
+            <img
+              src={getImagePreview()}
+              alt="user"
+              width="100"
+              height="100"
+              style={{ borderRadius: "10px" }}
+            />
+          )}
+
+          {/* Upload new image */}
+          <input
+            type="file"
+            name="image"
+            onChange={(e) => setImage(e.target.files[0])}
+          />
+        </div>
+
         <div className="form-actions">
-          <button type="submit" className="btn-primary" disabled={loading}>
+          <button type="submit" disabled={loading}>
             {loading ? "Editing..." : "Edit User"}
           </button>
 
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={() => navigate("/")}
-          >
+          <button type="button" onClick={() => navigate("/")}>
             Cancel
           </button>
         </div>
