@@ -166,6 +166,7 @@ function EditUser() {
           <input
             type="file"
             name="image"
+            accept="image/*"
             onChange={(e) => setImage(e.target.files[0])}
           />
         </div>
