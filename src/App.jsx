@@ -3,38 +3,43 @@ import { NavLink } from "react-router";
 
 function App() {
   const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [error, setError] = useState("");
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const res = await fetch("http://localhost:3000/users");
-
-      if (!res.ok) {
-        const errData = await res.json();
-        console.log("❌ GET error:", errData);
-        throw new Error(errData.error || "Failed to fetch users");
-      }
-
-      const data = await res.json();
-      console.log("✅ Users fetched successfully:", data);
-
-      setUsers(data);
-    } catch (err) {
-      console.log("🔥 GET Error:", err.message);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const res = await fetch(`http://localhost:3000/users?search=${search}`);
+
+        if (!res.ok) {
+          const errData = await res.json();
+          console.log("❌ GET error:", errData);
+          throw new Error(errData.error || "Failed to fetch users");
+        }
+
+        const data = await res.json();
+        console.log("✅ Users fetched successfully:", data);
+
+        setUsers(data);
+      } catch (err) {
+        console.log("🔥 GET Error:", err.message);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const timer = setTimeout(() => {
+      fetchUsers();
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
@@ -65,12 +70,19 @@ function App() {
     }
   };
 
-  if (loading) return <h2 className="page-container">Loading users...</h2>;
-
   return (
     <div className="page-container">
       <h2>User List</h2>
 
+      <input
+        type="text"
+        placeholder="Search by name or email..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      <button onClick={() => setSearch("")}>Clear</button>
+
+      {loading && <p>Loading users...</p>}
       {error && <p className="error-msg">{error}</p>}
 
       {users.length === 0 ? (
