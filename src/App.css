@@ -55,7 +55,9 @@ tbody tr:nth-child(odd) {
   font-size: 15px;
   padding: 6px 0;
   border-bottom: 2px solid transparent;
-  transition: color 0.2s, border-color 0.2s;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
 }
 
 .nav-link:hover {
@@ -184,4 +186,3 @@ tbody tr:nth-child(odd) {
   font-size: 14px;
   margin-bottom: 12px;
 }
-

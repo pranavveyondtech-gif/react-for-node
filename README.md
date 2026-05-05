@@ -1,16 +1,60 @@
-# React + Vite
+# React User Management App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A practice project for learning React with Node.js backend integration. This is a frontend React application that provides a user management interface, communicating with a Node.js API server.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **User List**: Display all users in a table format
+- **Search Functionality**: Search users by name or email with debounced input
+- **Add User**: Form to create new users
+- **Edit User**: Update existing user information
+- **Delete User**: Remove users with confirmation dialog
+- **Responsive Design**: Clean, modern UI with CSS styling
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend**: React 19, React Router 7
+- **Build Tool**: Vite
+- **Styling**: CSS
+- **Linting**: ESLint
 
-## Expanding the ESLint configuration
+## Prerequisites
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Node.js (v16 or higher)
+- npm or yarn
+- A running Node.js backend server on `http://localhost:3000` (not included in this repository)
+
+**Note**: This frontend requires a backend API server running on port 3000. Make sure your Node.js backend is started separately.
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+
+## Project Structure
+
+```
+src/
+├── App.jsx          # Main user list component
+├── AddUser.jsx      # Add new user form
+├── EditUser.jsx     # Edit existing user form
+├── Header.jsx       # Navigation header
+├── main.jsx         # App entry point
+├── App.css          # Main styles
+└── index.css        # Global styles
+```
+
+## API Endpoints
+
+The app communicates with the following backend endpoints:
+
+- `GET /users?search=<query>` - Fetch users (with optional search)
+- `POST /users` - Create new user
+- `PUT /users/:id` - Update user
+- `DELETE /users/:id` - Delete user
+
+## Contributing
+
+This is a practice project for learning purposes. Feel free to experiment and modify the code.
